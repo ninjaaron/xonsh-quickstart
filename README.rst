@@ -222,7 +222,7 @@ Substitutions
 Python Substitution
 +++++++++++++++++++
 One problem with environment variables is that they just call ``str()``
-when they are used in command mode that means:
+when they are used in command mode. That means:
 
 .. code:: sh
 
