@@ -208,7 +208,7 @@ arbitrary names beginning with ``$``, which only exist for the lifetime
 of the current shell. These values are global, and they work in both
 subprocess mode and Python mode. In subprocess mode, their values will
 have ``str()`` called on them when they are converted into arguments,
-but they work like any other variable in Bash. Like Bash, these
+but they work like any other variable in Python mode. Like Bash, these
 variables can be interpolated freely into strings. Unlike Bash, they
 don't require quoting for safety.
 
