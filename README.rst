@@ -10,11 +10,14 @@ and complete, it involves a lot of reading to get enough understanding
 to be productive with xonsh. The goal of this guide is to allow you to
 become productive as quickly as possible in the interactive prompt,
 which is accomplished by omitting a lot of details. Refer to the
-official documentation for more information if you need it.
+official documentation for more information if you need it. I have
+another tutorial on `administrative scripting with Python`_ which is
+complementary to this on in many ways, in that it shows how to do a lot
+of common shell tasks in native Python.
 
 This page will also not teach any Python. If you want to use Xonsh and
 don't know Python, you're going to need that. Try the `official
-tutorial`_. I may at some point write a Python  uickstart guide, but I
+tutorial`_. I may at some point write a Python quickstart guide, but I
 wouldn't hold your breath.
 
 Also, one warning: It's a bad idea to set xonsh as your default shell
@@ -28,6 +31,10 @@ running xonsh.
 .. contents::
 
 .. _xonsh: https://xon.sh/
+
+.. _administrative scripting with Python:
+  https://github.com/ninjaaron/replacing-bash-scripting-with-python
+
 .. _official tutorial: https://docs.python.org/3/tutorial/index.html
 
 A Tale of Two Modes
