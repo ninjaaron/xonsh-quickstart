@@ -240,7 +240,7 @@ when they are used in subprocess mode. That means:
 
 The way to get this to do the right thing is with Python substitution.
 Python substitution allows embedding the value of arbitrary Python
-expressions into subprocess. If the Python value is an iterable, it will
+expressions into commands. If the Python value is an iterable, it will
 be split into separate arguments. Python interpolation is marked with
 ``@()``.
 
