@@ -171,7 +171,7 @@ pathlib.Path_ instances, which are a very pleasant way of dealing with
 paths if I do say so myself. This is done by prefixing either type of
 glob string with a ``p``
 
-.. code:: python
+.. code:: bash
 
   >>> for p in p`/etc/.*`:
   ...     if p.is_dir():
