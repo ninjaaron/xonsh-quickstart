@@ -53,13 +53,14 @@ These two modes are essentially what allows to xonsh to be an effective
 shell and a Python superset. It also means you're essentially using two
 different languages in the shell. These modes are switched between
 implicitly in certain contexts. Python mode is essentially Python, so
-it will not receive a section with its own explanation. However, command
-mode requires a little description, which you will find in the next
-section. Following that, there is a description of the mechanisms one
-can use to move data back and forth between these two modes.
+it will not receive a section with its own explanation. However,
+subprocess mode requires a little description, which you will find in
+the next section. Following that, there is a description of the
+mechanisms one can use to move data back and forth between these two
+modes.
 
-Command Mode
-------------
+Subprocess Mode
+---------------
 Command mode is entered automatically when a line begins with a name
 that doesn't exist in the current scope. In this mode, the syntax is
 similar to any POSIX shell (including Bash). The name of the executable
@@ -109,22 +110,22 @@ the following section. Additionally, quoting part of a string with
 special characters and leaving another part unquoted (perhaps for the
 use of a glob character) is not permitted. The creators of xonsh find
 this behavior to be "insane_". I find its omission to be rather
-annoying, and the command-mode way of interpreting such strings is not
-an improvement by any stretch. In any case, xonsh has mechanisms to
+annoying, and the subprocess mode way of interpreting such strings is
+not an improvement by any stretch. In any case, xonsh has mechanisms to
 compensate for some of this which will be covered in the next section.
 
-Command mode also supports ``&&`` and ``||`` operators for running
+Subprocess mode also supports ``&&`` and ``||`` operators for running
 additional commands on success or failure, However, they recommend using
 the more Pythonic-looking ``and`` and ``or`` operators.
 
 Backgrounding processes with ``&`` also works. See `job control`_ for
 more.
 
-Command substitution in command mode only works with ``$()``. Backticks
-mean something else in xonsh. Both of these features will be covered in
-more detail in the following section.
+Command substitution in subprocess mode only works with ``$()``.
+Backticks mean something else in xonsh. Both of these features will be
+covered in more detail in the following section.
 
-That about covers it for the quickstart to command mode. The next
+That about covers it for the quickstart to subprocesses mode. The next
 section deals with passing data between the two modes.
 
 .. _redirection syntax:
@@ -138,14 +139,14 @@ section deals with passing data between the two modes.
 
 Going between the Modes
 -----------------------
-There are several special xonsh constructs that work both in command
+There are several special xonsh constructs that work both in subprocess
 mode and in Python mode which can be useful for carting data around,
 though the first feature we'll cover will be globbing, which isn't
 exactly a way to move data between the modes.
 
 Globs
 ~~~~~
-aside from the unquoted globbing behavior in command mode, xonsh
+aside from the unquoted globbing behavior in subprocess mode, xonsh
 supports regex globbing everywhere with backticks. This feels overkill
 most of the time, but is extremely useful when you need it. It is also
 somewhat necessitated by the omission of brace expansion.
@@ -205,11 +206,11 @@ xonsh's notion of environment variables includes things like ``$HOME``
 and ``$SHELL``, but also includes the assignment of arbitrary values to
 arbitrary names beginning with ``$``, which only exist for the lifetime
 of the current shell. These values are global, and they work in both
-command mode and Python mode. In command mode, their values will have
-``str()`` called on them when they are converted into arguments, but
-they work like any other variable in Bash. Like Bash, these variables
-can be interpolated freely into strings. Unlike Bash, they don't require
-quoting for safety.
+subprocess mode and Python mode. In subprocess mode, their values will
+have ``str()`` called on them when they are converted into arguments,
+but they work like any other variable in Bash. Like Bash, these
+variables can be interpolated freely into strings. Unlike Bash, they
+don't require quoting for safety.
 
 .. code:: bash
 
@@ -229,7 +230,7 @@ Substitutions
 Python Substitution
 +++++++++++++++++++
 One problem with environment variables is that they just call ``str()``
-when they are used in command mode. That means:
+when they are used in subprocess mode. That means:
 
 .. code:: sh
 
@@ -239,7 +240,7 @@ when they are used in command mode. That means:
 
 The way to get this to do the right thing is with Python substitution.
 Python substitution allows embedding the value of arbitrary Python
-expressions into commands. If the Python value is an iterable, it will
+expressions into subprocess. If the Python value is an iterable, it will
 be split into separate arguments. Python interpolation is marked with
 ``@()``.
 
@@ -253,7 +254,7 @@ be split into separate arguments. Python interpolation is marked with
   $ echo @('foo    bar     baz'.split())
   foo bar baz
 
-Python substitution only works in command mode (because it is redundant
+Python substitution only works in subprocess mode (because it is redundant
 in Python mode).
 
 Command Substitution(s)
