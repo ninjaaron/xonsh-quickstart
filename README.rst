@@ -12,7 +12,7 @@ become productive as quickly as possible in the interactive prompt,
 which is accomplished by omitting a lot of details. Refer to the
 official documentation for more information if you need it. I have
 another tutorial on `administrative scripting with Python`_ which is
-complementary to this on in many ways, in that it shows how to do a lot
+complementary to this one in some ways, in that it shows how to do a lot
 of common shell tasks in native Python.
 
 This page will also not teach any Python. If you want to use Xonsh and
