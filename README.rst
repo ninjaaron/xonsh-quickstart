@@ -101,9 +101,9 @@ expansion, though xonsh does offer array expansion, as we will see in
 the following section. Additionally, quoting part of a string with
 special characters and leaving another part unquoted (perhaps for the
 use of a glob character) is not permitted. The creators of xonsh find
-this behavior to be "insane_". I find it omission to be rather annoying,
-and the command-mode way of interpreting such strings is not an
-improvement by any stretch. In any case, xonsh has mechanisms to
+this behavior to be "insane_". I find its omission to be rather
+annoying, and the command-mode way of interpreting such strings is not
+an improvement by any stretch. In any case, xonsh has mechanisms to
 compensate for some of this which will be covered in the next section.
 
 Command mode also supports ``&&`` and ``||`` operators for running
