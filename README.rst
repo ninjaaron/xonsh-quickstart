@@ -66,7 +66,7 @@ any other shell. Basic globbing also works, and ``**`` may be used for
 recursive globbing as in some other shell dialects. Pipes and I/O
 redirection also works in a similar way to the shell, though heredocs
 are not included. Though xonsh provides additional `redirection
-syntax`_, the standard mechanisms work just fine. 
+syntax`_, the standard syntax work just fine. 
 
 .. code:: sh
 
