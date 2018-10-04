@@ -32,7 +32,7 @@ your breath.
 
 A Tale of Two Modes
 -------------------
-You already know the upside of xonsh: It's Python and not Bash[#]_.
+You already know the upside of xonsh: It's Python and not Bash [#]_.
 
 Here's the downside of xonsh: shells are optimized for interactively
 starting processes. Python is not (to say the least!). The xonsh
@@ -43,29 +43,30 @@ more like Bash (without all the dangerous, spiky edges).
 These two modes are what allows to xonsh to be an effective shell and a
 Python superset. It also means you're essentially using two different
 languages. These modes are switched between implicitly in certain
-contexts. Python mode is essentially Python, so it will not receive a
+contexts. Python mode is more or less Python, so it will not receive a
 section with its own explanation. However, subprocess mode requires a
 little description, which you will find in the next section.  Following
 that, there is a description of the mechanisms one can use to move data
-back and forth between these two modes.
+back and forth between these two modes, and finally some configuration
+tips.
 
 .. [#] I say "Bash" frequently in this guide, but I am really referring
-  to POSIX shells in general
+  to POSIX shells in general.
 
 Subprocess Mode
 ---------------
-Command mode is entered automatically when a line begins with a name
+Subprocess mode is entered automatically when a line begins with a name
 that doesn't exist in the current scope. In this mode, the syntax is
-similar to any POSIX shell (including Bash). The name of the executable
-is followed by a sequence of arguments split on whitespace, which are
+superficially similar to any POSIX shell. The name of the executable is
+followed by a sequence of arguments split on whitespace, which are
 interpreted as an array of strings in the program being executed. As in
-the shell, these strings can be quoted to escape special
-characters. This means most commands will look very similar to the way
-they would in any other shell. Basic globbing also works, and ``**`` may
-be used for recursive globbing as in some other shell dialects. Pipes
-and I/O redirection also works in a similar way to the shell, though
-heredocs are not included. Though xonsh provides additional `redirection
-syntax`_, the standard mechanisms work just fine.
+the shell, these strings can be quoted to escape special characters.
+This means most commands will look very similar to the way they would in
+any other shell. Basic globbing also works, and ``**`` may be used for
+recursive globbing as in some other shell dialects. Pipes and I/O
+redirection also works in a similar way to the shell, though heredocs
+are not included. Though xonsh provides additional `redirection
+syntax`_, the standard mechanisms work just fine. 
 
 .. code:: sh
 
@@ -88,24 +89,58 @@ strings are Python 3 strings in every way. They can take the same kinds
 of prefixes Python strings can (bytes strings also work), use the same
 escape sequences, same rules for double and single quotes, and
 triple-quote strings are also allowed. In Python 3.6, f-strings also
-work.
+work. What may be a surprise is that backslash escapes in filenames are
+not allowed. Strings literals are the only way to escape special shell
+characters. (... excluding so-called `subprocess macros`_...)
 
-Some things are also missing. The one I miss the most is brace
-expansion, though xonsh does offer array expansion, as we will see in
-the following section. Additionally, quoting part of a string with
-special characters and leaving another part unquoted (perhaps for the
-use of a glob character) is not permitted. The creators of xonsh find
-this behavior to be "insane_". I find its omission to be rather
-annoying, and the subprocess mode way of interpreting such strings is
-not an improvement by any stretch. In any case, xonsh has mechanisms to
-compensate for some of this which will be covered in the next section.
+.. code:: sh
+
+  $ rm filename\ with\ spaces
+  /usr/bin/rm: cannot remove 'filename\': No such file or directory
+  /usr/bin/rm: cannot remove 'with\': No such file or directory
+  /usr/bin/rm: cannot remove 'spaces': No such file or directory
+  $ rm 'filename with spaces'
+  $
+
+This makes perfect sense to me but some other things are also missing.
+The one I miss the most is brace expansion, though xonsh does offer
+array expansion, as we will see in the following section. Additionally,
+quoting part of a string with special characters and leaving another
+part unquoted (perhaps for the use of a glob character or brace
+expansion) is not permitted. The creators of xonsh find this behavior to
+be "insane_". I find its omission to be rather annoying, and the xonsh
+way of interpreting such arguments is useless.
+
+.. code:: sh
+
+  $ touch 'filename with spaces'
+  $ ls -l 'filename with'*
+  /usr/bin/ls: cannot access ''\''filename with'\''*': No such file or directory
+  $ # ^ someone else's idea of sanity.
+  
+
+In any case, xonsh has additional globbing mechanisms to compensate for
+some of this which will be covered in the next section, and I'm happy to
+say this is really the only major wart I can find on xonsh.
 
 Subprocess mode also supports ``&&`` and ``||`` operators for running
 additional commands on success or failure, However, they recommend using
 the more Pythonic-looking ``and`` and ``or`` operators.
 
+.. code:: sh
+
+  $ sudo apt-get update && sudo apt-get dist-upgrade
+  [...]
+  $ # alternative: sudo apt-get update and sudo apt-get dist-upgrade
+
 Backgrounding processes with ``&`` also works. See `job control`_ for
 more.
+
+.. code:: sh
+
+  $ firefox &
+  $
+  $ # firefox is running along on its merry way.
 
 Command substitution in subprocess mode only works with ``$()``.
 Backticks mean something else in xonsh. Both of these features will be
@@ -116,6 +151,9 @@ section deals with passing data between the two modes.
 
 .. _redirection syntax:
   https://xon.sh/tutorial.html#input-output-redirection
+
+.. _subprocess macros:
+  https://xon.sh/tutorial_macros.html#subprocess-macros
 
 .. _insane:
   https://xon.sh/tutorial_subproc_strings.html?highlight=insane#the-quotes-stay
