@@ -121,7 +121,7 @@ way of interpreting such arguments is useless.
 
 In any case, xonsh has additional globbing mechanisms to compensate for
 some of this which will be covered in the next section, and I'm happy to
-say this is really the only major wart I can find on xonsh.
+say this is really the only wart I can find on xonsh.
 
 Subprocess mode also supports ``&&`` and ``||`` operators for running
 additional commands on success or failure, However, they recommend using
