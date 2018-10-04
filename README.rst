@@ -1,32 +1,25 @@
 xonsh Quickstart
 ================
-xonsh_ is a shell language like Bash or PowerShell or whatever that is a
-Python superset. It is very handy. I'm not going to give you the
-commercial for it here. If you know Python and you use Bash ever, you
-already know why you want more Python in your shell.
+xonsh_ is an interactive system shell that is a Python superset. It is
+very handy. I'm not going to give you the commercial for it here. If you
+know Python and you use Bash ever, you already know why you want more
+Python in your shell.
 
 This guide exists because, while the xonsh documentation is well-written
-and complete, it involves a lot of reading to get enough understanding
-to be productive with xonsh. The goal of this guide is to allow you to
-become productive as quickly as possible in the interactive prompt,
-which is accomplished by omitting a lot of details. Refer to the
-official documentation for more information if you need it. I have
-another tutorial on `administrative scripting with Python`_ which is
-complementary to this one in some ways, in that it shows how to do a lot
-of common shell tasks in native Python.
+and complete, it involves a lot of reading to be productive with xonsh.
+The goal of this guide is to allow you to become productive as quickly
+as possible in the interactive prompt, which is accomplished by omitting
+a lot of details. Refer to the official documentation for more
+information if you need it.
 
-This page will also not teach any Python. If you want to use Xonsh and
-don't know Python, you're going to need that. Try the `official
-tutorial`_. I may at some point write a Python quickstart guide, but I
-wouldn't hold your breath.
+I have another tutorial on `administrative scripting with Python`_ which
+is complementary to this one in some ways, in that it shows how to do a
+lot of common shell tasks in native Python.
 
-Also, one warning: It's a bad idea to set xonsh as your default shell
-with ``chsh``. While this isn't a problem most of the time, there are
-occasionally applications which will "shell out" to whatever you user's
-shell is. They are expecting a POSIX shell. xonsh is very likely to
-wreck their world. Instead, go into your terminal preferences and set
-xonsh as the starup command, or make a keybinding to launch a terminal
-running xonsh.
+This page will not teach any Python. If you want to use Xonsh and don't
+know Python, you're going to need that. Try the `official tutorial`_. I
+may at some point write a Python quickstart guide, but I wouldn't hold
+your breath.
 
 .. contents::
 
@@ -39,25 +32,25 @@ running xonsh.
 
 A Tale of Two Modes
 -------------------
-You already know the upside of xonsh: It's Python and not Bash. Bash is
-a decent interactive shell and a rather poor programming language.
+You already know the upside of xonsh: It's Python and not Bash[#]_.
 
 Here's the downside of xonsh: shells are optimized for interactively
 starting processes. Python is not (to say the least!). The xonsh
-compromise, and I think it may be the right one, is to have two modes:
-Python mode, where everything is (basically) Python, and subprocess
-mode, where things look and act a lot more like Bash (without all the
-dangerous spiky edges).
+compromise is to have two modes: Python mode, where everything is
+(basically) Python, and subprocess mode, where things look and act a lot
+more like Bash (without all the dangerous, spiky edges).
 
-These two modes are essentially what allows to xonsh to be an effective
-shell and a Python superset. It also means you're essentially using two
-different languages in the shell. These modes are switched between
-implicitly in certain contexts. Python mode is essentially Python, so
-it will not receive a section with its own explanation. However,
-subprocess mode requires a little description, which you will find in
-the next section. Following that, there is a description of the
-mechanisms one can use to move data back and forth between these two
-modes.
+These two modes are what allows to xonsh to be an effective shell and a
+Python superset. It also means you're essentially using two different
+languages. These modes are switched between implicitly in certain
+contexts. Python mode is essentially Python, so it will not receive a
+section with its own explanation. However, subprocess mode requires a
+little description, which you will find in the next section.  Following
+that, there is a description of the mechanisms one can use to move data
+back and forth between these two modes.
+
+.. [#] I say "Bash" frequently in this guide, but I am really referring
+  to POSIX shells in general
 
 Subprocess Mode
 ---------------
@@ -76,17 +69,10 @@ syntax`_, the standard mechanisms work just fine.
 
 .. code:: sh
 
-  $ ls -l /usr
-  total 8
-  drwxr-xr-x 1 root root  63194 Sep 25 19:43 bin
-  drwxr-xr-x 1 root root  20842 Sep 24 20:38 include
-  drwxr-xr-x 1 root root 137232 Sep 24 20:50 lib
-  drwxr-xr-x 1 root root  38424 Sep 24 20:38 lib32
-  lrwxrwxrwx 1 root root      3 Aug 21 16:21 lib64 -> lib
-  drwxr-xr-x 1 root root     72 Mar 26  2017 local
-  lrwxrwxrwx 1 root root      3 Aug 21 16:21 sbin -> bin
-  drwxr-xr-x 1 root root   3352 Sep 16 14:52 share
-  drwxr-xr-x 1 root root      0 Mar 26  2017 src
+  $ ls -l
+  total 40
+  -rw-r--r-- 1 ninjaaron ninjaaron 26872 Oct  3 23:01 out.html
+  -rw-r--r-- 1 ninjaaron ninjaaron 11313 Oct  4 21:32 README.rst
   $ touch 'filename with spaces'
   $ ls -l 'filename with spaces'
   -rw-r--r-- 1 ninjaaron ninjaaron 0 Oct  3 21:15 'filename with spaces'
