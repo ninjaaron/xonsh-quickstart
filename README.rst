@@ -62,11 +62,11 @@ followed by a sequence of arguments split on whitespace, which are
 interpreted as an array of strings in the program being executed. As in
 the shell, these strings can be quoted to escape special characters.
 This means most commands will look very similar to the way they would in
-any other shell. Basic globbing also works, and ``**`` may be used for
-recursive globbing as in some other shell dialects. Pipes and I/O
-redirection also works in a similar way to the shell, though heredocs
-are not included. Though xonsh provides additional `redirection
-syntax`_, the standard syntax work just fine. 
+any other shell. Basic globbing also works, and ``**`` may be used in
+Python 3.5+ for recursive globbing as in some other shell dialects.
+Pipes and I/O redirection also works in a similar way to the shell,
+though heredocs are not included. Though xonsh provides additional
+`redirection syntax`_, the standard syntax work just fine. 
 
 .. code:: sh
 
