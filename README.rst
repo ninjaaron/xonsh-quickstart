@@ -296,7 +296,6 @@ be split into separate arguments. Python substitution is marked with
   $ # Cartesian products can also be produced
   $ echo @(list('abc')):@(list('def'))                                                                                                                
   a:d a:e a:f b:d b:e b:f c:d c:e c:f
-  $ # Unfortunately, this can't yet be combined with globbing.
 
 Python substitution only works in subprocess mode (because it is
 redundant in Python mode).
