@@ -86,12 +86,14 @@ though heredocs are not included. Though xonsh provides additional
 No big surprises there. However, there are major differences from a
 POSIX shell dialect. For one thing, you may be glad to learn that the
 strings are Python 3 strings in every way. They can take the same kinds
-of prefixes Python strings can (bytes strings also work), use the same
-escape sequences, same rules for double and single quotes, and
-triple-quote strings are also allowed. In Python 3.6, f-strings also
-work. What may be a surprise is that backslash escapes in filenames are
-not allowed. Strings literals are the only way to escape special shell
-characters. (... excluding so-called `subprocess macros`_...)
+of prefixes Python strings can (raw strings and bytes strings also
+work), use the same escape sequences, same rules for double and single
+quotes, and triple-quote strings are also allowed. In Python 3.6,
+f-strings also work, though embedding xnosh-specific syntax in them does
+not seem to be supported yet. What may be a surprise is that backslash
+escapes in filenames are not allowed. Strings literals are the only way
+to escape special shell characters. (... excluding so-called `subprocess
+macros`_...)
 
 .. code:: sh
 
@@ -104,12 +106,14 @@ characters. (... excluding so-called `subprocess macros`_...)
 
 This makes perfect sense to me but some other things are also missing.
 The one I miss the most is brace expansion, though xonsh does offer
-array expansion, as we will see in the following section. Additionally,
-quoting part of a string with special characters and leaving another
-part unquoted (perhaps for the use of a glob character or brace
-expansion) is not permitted. The creators of xonsh find this behavior to
-be "insane_". I find its omission to be rather annoying, and the xonsh
-way of interpreting such arguments is useless.
+iterable expansion, as we will see in the following section (and I'm
+trying to `be the change I want to see`_).
+
+Additionally, quoting part of a string with special characters and
+leaving another part unquoted (perhaps for the use of a glob character
+or brace expansion) is not permitted. The creators of xonsh find this
+behavior to be "insane_". I find its omission to be rather annoying, and
+the xonsh way of interpreting such arguments is useless.
 
 .. code:: sh
 
@@ -118,7 +122,6 @@ way of interpreting such arguments is useless.
   /usr/bin/ls: cannot access ''\''filename with'\''*': No such file or directory
   $ # ^ someone else's idea of sanity.
   
-
 In any case, xonsh has additional globbing mechanisms to compensate for
 some of this which will be covered in the next section, and I'm happy to
 say this is really the only wart I can find on xonsh.
@@ -154,6 +157,9 @@ section deals with passing data between the two modes.
 
 .. _subprocess macros:
   https://xon.sh/tutorial_macros.html#subprocess-macros
+
+.. _be the change I want to see:
+  https://github.com/xonsh/xonsh/pull/2868
 
 .. _insane:
   https://xon.sh/tutorial_subproc_strings.html?highlight=insane#the-quotes-stay
@@ -227,14 +233,24 @@ Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~
 In xonsh, "environment variables" are prefixed with a ``$``, as in Bash.
 xonsh's notion of environment variables includes things like ``$HOME``
-and ``$SHELL``, but also includes the assignment of arbitrary values to
+and ``$PATH``, but also includes the assignment of arbitrary values to
 arbitrary names beginning with ``$``, which only exist for the lifetime
 of the current shell. These values are global, and they work in both
-subprocess mode and Python mode. In subprocess mode, their values will
-have ``str()`` called on them when they are converted into arguments,
-but they work like any other variable in Python mode. Like Bash, these
-variables can be interpolated freely into strings. Unlike Bash, they
-don't require quoting for safety.
+subprocess mode and Python mode. In subprocess mode, this is how they
+are converted into arguments:
+
+- certain built-in environment variables have predefined conversion
+  functions, which will create a sensible string representation.
+- if a variable doesn't have such a function registered (e.g. any
+  variable you create yourself), it will call ``str()`` on the object.
+
+An example of the first kind of variable is ``$PATH`` which is a wrapper
+on a list internally, but will print as colon-separated values (as a
+``$PATH`` would in Bash).
+
+Environment variables work like any other variable in Python mode. Like
+Bash, these variables can be interpolated freely into strings. Unlike
+Bash, they don't require quoting for safety.
 
 .. code:: bash
 
@@ -253,8 +269,8 @@ Substitutions
 
 Python Substitution
 +++++++++++++++++++
-One problem with environment variables is that they just call ``str()``
-when they are used in subprocess mode. That means:
+One problem with user-created environment variables is that they just
+call ``str()`` when they are used in subprocess mode. That means:
 
 .. code:: sh
 
@@ -275,11 +291,15 @@ be split into separate arguments. Python substitution is marked with
   lrwxrwxrwx 1 root root    7 Aug 21 16:21 /bin -> usr/bin
   drwxr-xr-x 1 root root 3068 Sep 25 22:47 /etc
   drwxr-xr-x 1 root root   80 Sep 25 19:43 /usr
-  $ echo @('foo    bar     baz'.split())
-  foo bar baz
+  $ echo hello-@('foo    bar     baz'.split())
+  hello-foo hello-bar hello-baz
+  $ # Cartesian products can also be produced
+  $ echo @(list('abc')):@(list('def'))                                                                                                                
+  a:d a:e a:f b:d b:e b:f c:d c:e c:f
+  $ # Unfortunately, this can't yet be combined with globbing.
 
-Python substitution only works in subprocess mode (because it is redundant
-in Python mode).
+Python substitution only works in subprocess mode (because it is
+redundant in Python mode).
 
 Command Substitution(s)
 +++++++++++++++++++++++
