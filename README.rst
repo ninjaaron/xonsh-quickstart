@@ -19,7 +19,8 @@ lot of common shell tasks in native Python.
 This page will not teach any Python. If you want to use Xonsh and don't
 know Python, you're going to need that. Try the `official tutorial`_. I
 may at some point write a Python quickstart guide, but I wouldn't hold
-your breath.
+your breath. This guide also assumes some familiarity with Bash or other
+POSIX shell.
 
 .. contents::
 
@@ -32,41 +33,50 @@ your breath.
 
 A Tale of Two Modes
 -------------------
-You already know the upside of xonsh: It's Python and not Bash [#]_.
+Shell syntax is optimized for launching processes. Python is not. The
+xonsh solution is to have two modes.
 
-Here's the downside of xonsh: shells are optimized for interactively
-starting processes. Python is not (to say the least!). The xonsh
-compromise is to have two modes: Python mode, where everything is
-(basically) Python, and subprocess mode, where things look and act a lot
-more like Bash (without all the dangerous, spiky edges).
+- xonsh has Python mode and subprocess mode which have different
+  syntax.
+- Switching between modes is usually implicit, but can be forced_.
+- Python mode is just Python with a few extras.
+- Subprocess looks a bit like Bash [#]_, but it also has big differences.
+- xonsh provides constructs which work across both modes. Understanding
+  these constructs is key to effective use of the shell.
 
-These two modes are what allows to xonsh to be an effective shell and a
-Python superset. It also means you're essentially using two different
-languages. These modes are switched between implicitly in certain
-contexts. Python mode is more or less Python, so it will not receive a
-section with its own explanation. However, subprocess mode requires a
-little description, which you will find in the next section.  Following
-that, there is a description of the mechanisms one can use to move data
-back and forth between these two modes, and finally some configuration
-tips.
+Subprocess mode requires a little description, which you will find in
+the next section.  Following that, there is a description of the
+mechanisms one can use to move data back and forth between these two
+modes, and finally some configuration tips.
 
+.. _forced: Substitutions_
 .. [#] I say "Bash" frequently in this guide, but I am really referring
   to POSIX shells in general.
 
 Subprocess Mode
 ---------------
-Subprocess mode is entered automatically when a line begins with a name
-that doesn't exist in the current scope. In this mode, the syntax is
-superficially similar to any POSIX shell. The name of the executable is
-followed by a sequence of arguments split on whitespace, which are
-interpreted as an array of strings in the program being executed. As in
-the shell, these strings can be quoted to escape special characters.
-This means most commands will look very similar to the way they would in
-any other shell. Basic globbing also works, and ``**`` may be used in
-Python 3.5+ for recursive globbing as in some other shell dialects.
-Pipes and I/O redirection also works in a similar way to the shell,
-though heredocs are not included. Though xonsh provides additional
-`redirection syntax`_, the standard syntax work just fine. 
+Similarities to POSIX
+~~~~~~~~~~~~~~~~~~~~~
+Subprocess mode is automatic when a line begins with a name that doesn't
+exist in the current scope. In this mode Syntax is superficially similar
+to any POSIX shell:
+
+- A list of whitespace-separated arguments is handed to the executable
+  as strings.
+- these arguments can be quoted to escape special characters and
+  whitespace.
+- Basic globbing also works, and ``**`` may be used in Python 3.5+ for
+  recursive globbing as in some other popular shells.
+- ``&&`` and ``||`` work as in a POSIX shell, but the creators encourage
+  the use of ``and`` and ``or`` instead.
+- Backgrounding processes with ``&`` works. See `job control`_ for more.
+- Pipes and I/O redirection also works in a similar way to the shell.
+    ``|  >  >>  <  2>``, etc.
+
+Heredocs are not included. xonsh provides additional, more explicite
+`redirection syntax`_, but the standard POSIX forms work just fine. I'm
+not sure to what extent more advanced use of file descriptors is
+supported, but ``2>&1`` (I believe it may be special-cased).
 
 .. code:: sh
 
@@ -80,20 +90,20 @@ though heredocs are not included. Though xonsh provides additional
   $ # here's a glob
   $ echo /usr/*
   /usr/bin /usr/include /usr/lib /usr/lib32 /usr/lib64 /usr/local /usr/sbin /usr/share /usr/src
+  $ sudo apt-get update && sudo apt-get dist-upgrade
+  [...]
+  $ # alternative: sudo apt-get update and sudo apt-get dist-upgrade
+  $ firefox &
+  $ # firefox is running along on its merry way.
   $ echo /usr/l* | tr a-z A-Z
   /USR/LIB /USR/LIB32 /USR/LIB64 /USR/LOCAL
 
-No big surprises there. However, there are major differences from a
-POSIX shell dialect. For one thing, you may be glad to learn that the
-strings are Python 3 strings in every way. They can take the same kinds
-of prefixes Python strings can (raw strings and bytes strings also
-work), use the same escape sequences, same rules for double and single
-quotes, and triple-quote strings are also allowed. In Python 3.6,
-f-strings also work, though embedding xnosh-specific syntax in them does
-not seem to be supported yet. What may be a surprise is that backslash
-escapes in filenames are not allowed. Strings literals are the only way
-to escape special shell characters. (... excluding so-called `subprocess
-macros`_...)
+Differences from POSIX
+~~~~~~~~~~~~~~~~~~~~~~
+- Strings are Python 3 strings in every way.
+- Backslash escapes in arguments are not allowed.
+- Strings literals are the only way to escape special shell characters.
+  (... excluding so-called `subprocess macros`_...)
 
 .. code:: sh
 
@@ -104,50 +114,25 @@ macros`_...)
   $ rm 'filename with spaces'
   $
 
-This makes perfect sense to me but some other things are also missing.
-The one I miss the most is brace expansion, though xonsh does offer
-iterable expansion, as we will see in the following section (and I'm
-trying to `be the change I want to see`_).
-
-Additionally, quoting part of a string with special characters and
-leaving another part unquoted (perhaps for the use of a glob character
-or brace expansion) is not permitted. The creators of xonsh find this
-behavior to be "insane_". I find its omission to be rather annoying, and
-the xonsh way of interpreting such arguments is useless.
+- No brace expansion yet_ (iterables can be expanded. see: `Python
+  Substitution`_)
+- quoting part of a string with special characters and leaving another
+  part unquoted (perhaps for the use of a glob character or brace
+  expansion) is not permitted. The creators of xonsh find this behavior
+  to be "insane_".
 
 .. code:: sh
 
-  $ touch 'filename with spaces'
-  $ ls -l 'filename with'*
-  /usr/bin/ls: cannot access ''\''filename with'\''*': No such file or directory
+  $ touch "filename with spaces"
+  $ ls -l "filename with"*
+  /usr/bin/ls: cannot access '"filename with"*': No such file or directory
   $ # ^ someone else's idea of sanity.
-  
-In any case, xonsh has additional globbing mechanisms to compensate for
-some of this which will be covered in the next section, and I'm happy to
-say this is really the only wart I can find on xonsh.
+  $ # xonsh has additional globbing mechanisms to compensate for this
+  $ # lack, which are covered in the next section.
 
-Subprocess mode also supports ``&&`` and ``||`` operators for running
-additional commands on success or failure, However, they recommend using
-the more Pythonic-looking ``and`` and ``or`` operators.
-
-.. code:: sh
-
-  $ sudo apt-get update && sudo apt-get dist-upgrade
-  [...]
-  $ # alternative: sudo apt-get update and sudo apt-get dist-upgrade
-
-Backgrounding processes with ``&`` also works. See `job control`_ for
-more.
-
-.. code:: sh
-
-  $ firefox &
-  $
-  $ # firefox is running along on its merry way.
-
-Command substitution in subprocess mode only works with ``$()``.
-Backticks mean something else in xonsh. Both of these features will be
-covered in more detail in the following section.
+- Command substitution in subprocess mode only works with ``$()``.
+  Backticks mean something else in xonsh. Both of these features will be
+  covered in more detail in the following section.
 
 That about covers it for the quickstart to subprocesses mode. The next
 section deals with passing data between the two modes.
@@ -158,7 +143,7 @@ section deals with passing data between the two modes.
 .. _subprocess macros:
   https://xon.sh/tutorial_macros.html#subprocess-macros
 
-.. _be the change I want to see:
+.. _yet:
   https://github.com/xonsh/xonsh/pull/2868
 
 .. _insane:
@@ -202,12 +187,13 @@ use of g-strings. These are created with backticks and a ``g`` prefix.
   lrwxrwxrwx 1 root root      3 Aug 21 16:21 /usr/lib64 -> lib
   drwxr-xr-x 1 root root     72 Mar 26  2017 /usr/local
 
-This is once again useful for recursive globbing with ``**``.
+This is once again useful for recursive globbing with ``**`` in Python
+3.5+.
 
-One very useful feature about globs is that they can be used to return
-pathlib.Path_ instances, which are a very pleasant way of dealing with
-paths if I do say so myself. This is done by prefixing either type of
-glob string with a ``p``
+One very useful feature glob literals in xonsh is that they can be used
+to return pathlib.Path_ instances, which are a very pleasant way of
+dealing with paths if I do say so myself. This is done by prefixing
+either type of glob string with a ``p``
 
 .. code:: bash
 
@@ -294,7 +280,7 @@ be split into separate arguments. Python substitution is marked with
   $ echo hello-@('foo    bar     baz'.split())
   hello-foo hello-bar hello-baz
   $ # Cartesian products can also be produced
-  $ echo @(list('abc')):@(list('def'))                                                                                                                
+  $ echo @(list('abc')):@(list('def'))
   a:d a:e a:f b:d b:e b:f c:d c:e c:f
 
 Python substitution only works in subprocess mode (because it is
