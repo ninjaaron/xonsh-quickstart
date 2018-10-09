@@ -40,7 +40,8 @@ xonsh solution is to have two modes.
   syntax.
 - Switching between modes is usually implicit, but can be forced_.
 - Python mode is just Python with a few extras.
-- Subprocess looks a bit like Bash [#]_, but it also has big differences.
+- Subprocess mode looks a bit like Bash [#]_, but it also has big
+  differences.
 - xonsh provides constructs which work across both modes. Understanding
   these constructs is key to effective use of the shell.
 
@@ -161,8 +162,8 @@ exactly a way to move data between the modes.
 
 Globs
 ~~~~~
-aside from the unquoted globbing behavior in subprocess mode, xonsh
-supports regex globbing everywhere with backticks. This feels overkill
+Aside from the unquoted globbing behavior in subprocess mode, xonsh
+supports `regex globbing`_ everywhere with backticks. This feels overkill
 most of the time, but is extremely useful when you need it. It is also
 somewhat necessitated by the omission of brace expansion.
 
@@ -211,7 +212,8 @@ either type of glob string with a ``p``
   /etc/audit
   [...]
 
-
+.. _regex globbing:
+  https://xon.sh/tutorial.html#advanced-path-search-with-backticks
 .. _pathlib.Path:
   https://docs.python.org/3/library/pathlib.html#basic-use
 
@@ -320,9 +322,15 @@ from the process. Trailing newlines are not stripped.
   ['-rw-r--r--', '1', 'ninjaaron', 'ninjaaron', '26872', 'Oct', '3', '23:01', 'out.html']
   ['-rw-r--r--', '1', 'ninjaaron', 'ninjaaron', '10726', 'Oct', '3', '23:20', 'README.rst']
 
-This object has other interesting properties as well. Look at the
+This object has other interesting properties as well, such as boolean
+coercion based on the exit code of the process. Look at the
 documentation_ for further details. This form of substitution is
 probably what you generally want in Python mode.
+
+You can also force subprocess mode without capturing output using
+``$[]`` and ``![]``. ``![]`` returns a (weirdly unprintable) object with
+information about the process. ``$[]`` always returns ``None``, and I
+don't know why anyone would ever use it over ``![]``.
 
 .. _documentation:
   https://xon.sh/tutorial.html#captured-subprocess-with-and
