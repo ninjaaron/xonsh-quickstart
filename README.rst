@@ -72,12 +72,12 @@ to any POSIX shell:
   the use of ``and`` and ``or`` instead.
 - Backgrounding processes with ``&`` works. See `job control`_ for more.
 - Pipes and I/O redirection also works in a similar way to the shell.
-    ``|  >  >>  <  2>``, etc.
+  ``|  >  >>  <  2>``, etc.
 
-Heredocs are not included. xonsh provides additional, more explicite
+Heredocs are not included. xonsh provides additional, more explicit
 `redirection syntax`_, but the standard POSIX forms work just fine. I'm
 not sure to what extent more advanced use of file descriptors is
-supported, but ``2>&1`` (I believe it may be special-cased).
+supported, but ``2>&1`` works (I believe it may be special-cased).
 
 .. code:: sh
 
