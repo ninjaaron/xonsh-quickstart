@@ -337,4 +337,79 @@ don't know why anyone would ever use it over ``![]``.
 
 Basic Configuration, etc.
 -------------------------
-In progress
+Information on configuration is spread out all over the official docs,
+which was the most frustrating thing for me when I was trying it out the
+first time. I've tried to collect them here.
+
+- `Run Control File`_ tells about ~/.xonshrc and has some things you
+  might want to stick in it.
+- `Customizing xonsh`_ also shows how to do some interesting things like
+  set the color scheme, but also some bad things like how to set xonsh
+  as your default shell. Believe it or not, some 3rd-party programs do
+  rely on the default shell setting, and setting your shell with
+  ``chsh`` to a non-POSIX shell can break such programs. My advice is to
+  instead configure your terminal to launch with xonsh running, rather
+  than to change your default shell.
+- `Customizing the Prompt`_
+- `Environment Variables`_ is a complete list of environment variables,
+  many of which can be used for settings.
+- Aliases_ work differently in xonsh than in other shells.
+
+Personally, because I use several shells (zsh, fish and xonsh), I try to
+avoid more complex functions in my shell configuration files. Instead, I
+keep simple aliases in `one place`_ and parse out the correct code for
+different shells from there. This is how I do it in xonsh.
+
+.. code:: python
+
+  from hashlib import md5
+  # import shell aliases
+  al_cache = p'$HOME/.cache/ali_cache.xsh'  # home of xonsh aliases.
+  al_path = p'$HOME/.aliases'               # home of POSIX aliases.
+  al_hash = p'$HOME/.cache/ali_hash'        # place where a hash of the
+                                            # POSIX aliases live.
+
+  # see if the file has changed. Probably should just do this with timestamps.
+  with al_path.open('rb') as af, al_hash.open('rb') as ah:
+      old_hash = ah.read()
+      shell_aliases = af.read()
+      new_hash = md5(shell_aliases).digest()
+
+  if old_hash != new_hash:
+      # find lines containing aliases and reformate them to xonsh aliases.
+      ali = '\n'.join(i for i in shell_aliases.decode().splitlines()
+                      if i.startswith('alias '))
+      ali = re.sub(r'^alias ([\w-]*)=(.*?)$', r"aliases['\1'] = \2",
+                   ali, flags=re.M)
+      with al_hash.open('wb') as ah, al_cache.open('w') as ac:
+          ah.write(new_hash)
+          ac.write(ali)
+
+      exec(ali)
+
+  else:
+      source @(al_cache)
+
+
+For things that cannot be expressed as simple aliases, I try to just
+write scripts so I don't have to worry about portability between my
+various exotic shells.
+
+My whole xonshrc is here_. It contains some strange and possibly bad
+ideas. It comes with no warranty.
+
+.. _Run Control File: https://xon.sh/xonshrc.html
+.. _Customizing xonsh: https://xon.sh/customization.html
+.. _Customizing the Prompt: https://xon.sh/tutorial.html#customizing-the-prompt
+.. _Environment Variables: https://xon.sh/envvars.html
+.. _Aliases: https://xon.sh/tutorial.html#aliases
+.. _one place: https://github.com/ninjaaron/dot/blob/master/dotfiles/aliases
+.. _here: https://github.com/ninjaaron/dot/blob/master/dotfiles/xonshrc
+
+Working with Python Virtual Environments
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I don't know if this is exactly part of configuration, but, as you
+might expect, the standard virtualenv tools don't work with xonsh. This
+may not exactly be a configuration thing, but it's something Python
+developers need to know, and the info about it is here:
+https://xon.sh/python_virtual_environments.html
