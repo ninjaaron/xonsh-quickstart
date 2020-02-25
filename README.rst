@@ -413,3 +413,11 @@ might expect, the standard virtualenv tools don't work with xonsh. This
 may not exactly be a configuration thing, but it's something Python
 developers need to know, and the info about it is here:
 https://xon.sh/python_virtual_environments.html
+
+Using xonsh over SSH
+~~~~~~~~~~~~~~~~~~~~
+If you enjoy using xonsh and wish to use it on remote systems without
+having to install it everywhere you go, you may want to check out xxh_,
+a program for executing xonsh interactively on remote systems.
+
+.. _xxh: https://github.com/xonssh/xxh
